@@ -1,0 +1,5 @@
+slurm-output-*.out
+.ipynb_checkpoints/
+__pycache__/
+*.slurm
+*.ipynb
