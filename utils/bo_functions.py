@@ -34,13 +34,14 @@ def train_evaluate_architecture(num_neurons, num_layers):
     # Read DataFrame from CSV file
     metric_df = pd.read_csv(output_folder + '/metrics.csv')
     length = len(metric_df)
+    accuracy =  metric_df["RMSE"].iloc[-1]
 
     if iteration_counter == 1:
         #create empty dataframe with columns num_neurons, num_layers, length
-        data_histories = pd.DataFrame(columns=['num_neurons', 'num_layers', 'length'])
+        data_histories = pd.DataFrame(columns=['num_neurons', 'num_layers', 'length', 'RMSE', 'rmse*length'])
     else:
         data_histories = pd.read_csv(previous_output_folder + '/data_histories.csv')
-    new_row = pd.DataFrame({'num_neurons': [num_neurons], 'num_layers': [num_layers]})
+    new_row = pd.DataFrame({'num_neurons': [num_neurons], 'num_layers': [num_layers], 'length': [length], 'RMSE': [accuracy], 'rmse*length': [length*accuracy]})
 
     prev_data_histories_length = len(data_histories)
     # check if length in new_row is smaller than all other lengths in data_histories
@@ -136,15 +137,16 @@ def train_evaluate_hyperparameters(hyperparameters):
     # Read the metrics from the generated file
     metric_df = pd.read_csv(os.path.join(output_folder, 'metrics.csv'))
     length = len(metric_df)
+    accuracy = metric_df['RMSE'].iloc[-1]
     
     # Handle the data_histories file
     data_histories_path = os.path.join(previous_output_folder, 'data_histories.csv')
     if iteration_counter == 1 or not os.path.exists(data_histories_path):
-        data_histories = pd.DataFrame(columns=list(hyperparameters_with_defaults.keys()) + ['length'])
+        data_histories = pd.DataFrame(columns=list(hyperparameters_with_defaults.keys()) + ['length', 'RMSE', 'rmse*length'])
     else:
         data_histories = pd.read_csv(data_histories_path)
     
-    new_row = pd.DataFrame({**hyperparameters_with_defaults, 'length': length}, index=[0])
+    new_row = pd.DataFrame({**hyperparameters_with_defaults, 'length': length, 'accuracy': accuracy, 'length*accuracy': length*accuracy}, index=[0])
     prev_data_histories_length = len(data_histories)
 
     if length < data_histories.iloc[prev_data_histories_length:]['length'].min():
